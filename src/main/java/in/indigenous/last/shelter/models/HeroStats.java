@@ -1,8 +1,9 @@
 package in.indigenous.last.shelter.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class GlobalHeroStats {
+public class HeroStats {
 
 	private int range;
 
@@ -24,13 +25,17 @@ public class GlobalHeroStats {
 
 	private double lowerDamage;
 
-	private List<HeroSkills> skills;
+	private List<HeroSkills> skills = new ArrayList<>();
 
 	private int combatSpeed;
 
 	private double seigeMight;
 
 	private double lowerMight;
+
+	private double seigeDefenseMight;
+
+	private double bulwark;
 
 	public double getMarchingCapacity() {
 		return marchingCapacity;
@@ -142,6 +147,22 @@ public class GlobalHeroStats {
 
 	public void setLowerMight(double lowerMight) {
 		this.lowerMight = lowerMight;
+	}
+
+	public double getSeigeDefenseMight() {
+		return seigeDefenseMight;
+	}
+
+	public void setSeigeDefenseMight(double seigeDefenseMight) {
+		this.seigeDefenseMight = seigeDefenseMight;
+	}
+
+	public double getBulwark() {
+		return bulwark;
+	}
+
+	public void setBulwark(double bulwark) {
+		this.bulwark = bulwark;
 	}
 
 }

@@ -12,4 +12,5 @@ public class LastShelterHomeController {
 	public String home(Model model) {
 		return "home";
 	}
+	
 }

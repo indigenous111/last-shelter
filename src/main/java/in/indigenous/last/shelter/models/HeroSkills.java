@@ -34,6 +34,10 @@ public class HeroSkills {
 
 	private double seigeMight;
 
+	private double seigeDefenseMight;
+
+	private double bulwark;
+
 	public String getName() {
 		return name;
 	}
@@ -160,6 +164,22 @@ public class HeroSkills {
 
 	public void setSeigeMight(double seigeMight) {
 		this.seigeMight = seigeMight;
+	}
+
+	public double getSeigeDefenseMight() {
+		return seigeDefenseMight;
+	}
+
+	public void setSeigeDefenseMight(double seigeDefenseMight) {
+		this.seigeDefenseMight = seigeDefenseMight;
+	}
+
+	public double getBulwark() {
+		return bulwark;
+	}
+
+	public void setBulwark(double bulwark) {
+		this.bulwark = bulwark;
 	}
 
 }

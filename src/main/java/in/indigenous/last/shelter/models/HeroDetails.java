@@ -1,12 +1,14 @@
 package in.indigenous.last.shelter.models;
 
-public class GlobalHeroDetails {
+public class HeroDetails {
 
 	private Integer id;
 
 	private String name;
 
 	private String color;
+
+	private int level;
 
 	public Integer getId() {
 		return id;
@@ -30,6 +32,14 @@ public class GlobalHeroDetails {
 
 	public void setColor(String color) {
 		this.color = color;
+	}
+
+	public int getLevel() {
+		return level;
+	}
+
+	public void setLevel(int level) {
+		this.level = level;
 	}
 
 }

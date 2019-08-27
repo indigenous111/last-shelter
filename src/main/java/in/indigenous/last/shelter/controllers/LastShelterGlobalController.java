@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import in.indigenous.last.shelter.services.GlobalHeroDataService;
+import in.indigenous.last.shelter.services.TroopsService;
 
 @Controller
 @RequestMapping(value="/global")
@@ -16,6 +17,9 @@ public class LastShelterGlobalController {
 	
 	@Resource
 	private GlobalHeroDataService globalHeroDataService;
+	
+	@Resource
+	private TroopsService troopsService;
 	
 	@GetMapping("/home")
 	public String global(Model model)
@@ -28,6 +32,13 @@ public class LastShelterGlobalController {
 	{
 		model.addAttribute("heroDetails", globalHeroDataService.getGlobalHeroData());
 		return "global/hero-details";
+	}
+	
+	@RequestMapping(value="/troops/detail", method=RequestMethod.GET)
+	public String troops(Model model)
+	{
+		model.addAttribute("troopDetails", troopsService.getTroopsInfo());
+		return "global/troop-details";
 	}
 	
 }
