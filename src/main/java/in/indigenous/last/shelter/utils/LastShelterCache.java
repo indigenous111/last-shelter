@@ -13,33 +13,33 @@ import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.springframework.stereotype.Component;
 
 import in.indigenous.last.shelter.constants.LastShelterConstants;
-import in.indigenous.last.shelter.models.APCInfo;
-import in.indigenous.last.shelter.models.AccountHeroData;
-import in.indigenous.last.shelter.models.HeroData;
-import in.indigenous.last.shelter.models.Troops;
+import in.indigenous.last.shelter.models.apc.APC;
+import in.indigenous.last.shelter.models.hero.Hero;
+import in.indigenous.last.shelter.models.hero.skills.HeroSkill;
+import in.indigenous.last.shelter.models.troops.Troop;
 
 @Component
 public class LastShelterCache {
 
-	private final static int accounts = 4;
+	private final static int NUMBER_OF_ACCOUNTS = 4;
 
-	private List<HeroData> globalHeroData = new ArrayList<>();
+	private List<Hero> globalHeroData = new ArrayList<>();
 
-	private Map<Integer, Map<Integer, List<AccountHeroData>>> accountHeroData = new HashMap<>();
+	private Map<Integer, Map<Integer, List<HeroSkill>>> accountHeroData = new HashMap<>();
 
-	private Map<Integer, List<Troops>> globalTroopDetails = new HashMap<>();
+	private Map<Integer, List<Troop>> globalTroopDetails = new HashMap<>();
 
-	private Map<Integer, List<APCInfo>> apcInfos = new HashMap<>();
+	private Map<Integer, List<APC>> apcInfos = new HashMap<>();
 
 	@Resource
-	private TroopsUtils troopsUtils;
+	private TroopUtils troopUtils;
 
 	@Resource
 	private APCUtils apcUtils;
 
 	@Resource
 	private HeroUtils heroUtils;
-	
+
 	@Resource
 	private PropertiesConfiguration configuration;
 
@@ -59,10 +59,10 @@ public class LastShelterCache {
 		String accountHeroDataDir = configuration.getString(LastShelterConstants.LAST_SHELTER_ACC_DATA_FILE_DIR) + "//";
 		String accountHeroFileName = configuration.getString(LastShelterConstants.LAST_SHELTER_ACC_HERO_FILE);
 		String accountHeroSheetName = configuration.getString(LastShelterConstants.LAST_SHELTER_ACC_HERO_DETAILS_SHEET);
-		for (int i = 0; i < accounts; i++) {
+		for (int i = 0; i < NUMBER_OF_ACCOUNTS; i++) {
 			String calcAccountHeroDataDir = accountHeroDataDir + (i + 1);
 			try {
-				accountHeroData.put(i + 1, heroUtils.getAccountHeroData(calcAccountHeroDataDir, accountHeroFileName,
+				accountHeroData.put(i + 1, heroUtils.getAccountHeroSkill(calcAccountHeroDataDir, accountHeroFileName,
 						accountHeroSheetName, i + 1));
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -71,33 +71,33 @@ public class LastShelterCache {
 		String apcDataDir = configuration.getString(LastShelterConstants.LAST_SHELTER_ACC_DATA_FILE_DIR) + "//";
 		String apcFileName = configuration.getString(LastShelterConstants.LAST_SHELTER_ACC_APC_FILE);
 		String apcSheetName = configuration.getString(LastShelterConstants.LAST_SHELTER_ACC_APC_INFO_SHEET);
-		for (int i = 0; i < accounts; i++) {
-			String calcApcDataDir = apcDataDir +(i + 1);
+		for (int i = 0; i < NUMBER_OF_ACCOUNTS; i++) {
+			String calcApcDataDir = apcDataDir + (i + 1);
 			apcInfos.put(i + 1, apcUtils.getAPCInfo(calcApcDataDir, apcFileName, apcSheetName, i + 1));
 		}
 		String troopsDataDir = configuration.getString(LastShelterConstants.LAST_SHELTER_GLOBAL_DATA_FILE_DIR);
 		String troopsFileName = configuration.getString(LastShelterConstants.LAST_SHELTER_GLOBAL_TROOPS_DETAILS_FILE);
 		String troopsSheetName = configuration.getString(LastShelterConstants.LAST_SHELTER_GLOBAL_TROOPS_DETAILS_SHEET);
 		try {
-			globalTroopDetails = troopsUtils.getTroopsInfo(troopsDataDir, troopsFileName, troopsSheetName);
+			globalTroopDetails = troopUtils.getTroopInfo(troopsDataDir, troopsFileName, troopsSheetName);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public List<HeroData> getGlobalHeroData() {
+	public List<Hero> getGlobalHeroData() {
 		return globalHeroData;
 	}
 
-	public Map<Integer, List<AccountHeroData>> getAccountHeroData(int account) {
+	public Map<Integer, List<HeroSkill>> getAccountHeroData(int account) {
 		return accountHeroData.get(account);
 	}
 
-	public List<APCInfo> getAPCInfo(int account) {
+	public List<APC> getAPCInfo(int account) {
 		return apcInfos.get(account);
 	}
 
-	public Map<Integer, List<Troops>> getTroopsInfo() {
+	public Map<Integer, List<Troop>> getTroopsInfo() {
 		return globalTroopDetails;
 	}
 }

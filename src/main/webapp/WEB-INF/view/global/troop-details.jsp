@@ -46,7 +46,7 @@
 					HP</th>
 				<th
 					style="text-align: center; border: 1px solid black; background-color: black; color: white;">
-					Food</th>
+					Food Consumption</th>
 				<th
 					style="text-align: center; border: 1px solid black; background-color: black; color: white;">
 					Combat</th>
@@ -66,7 +66,7 @@
 						<td style="text-align: center; border: 1px solid black;">${troop.defense}</td>
 						<td style="text-align: center; border: 1px solid black;">${troop.load}</td>
 						<td style="text-align: center; border: 1px solid black;">${troop.hp}</td>
-						<td style="text-align: center; border: 1px solid black;">${troop.food}</td>
+						<td style="text-align: center; border: 1px solid black;">${troop.foodConsumption}</td>
 						<td style="text-align: center; border: 1px solid black;">${troop.combat}</td>
 					</tr>
 				</c:forEach>

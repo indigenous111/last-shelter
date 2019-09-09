@@ -43,18 +43,20 @@
 					Net Marching Capacity</th>
 			</tr>
 			<c:forEach items="${apcDetails}" var="apc" varStatus="counter">
-				<tr style="">
-					<td style="text-align: center; border: 1px solid black;">${counter.index + 1}</td>
-					<td style="text-align: center; border: 1px solid black;">${apc.name}</td>
-					<td style="text-align: center; border: 1px solid black;">${apc.layer}</td>
-					<td style="text-align: center; border: 1px solid black;">${apc.marchingCapacity}</td>
-					<td style="text-align: center; border: 1px solid black;">${apc.troops }</td>
-					<td style="text-align: center; border: 1px solid black;"><c:choose>
-							<c:when test="${not empty apc.heroName}">${apc.heroName}</c:when>
-							<c:otherwise>X</c:otherwise>
-						</c:choose></td>
-					<td style="text-align: center; border: 1px solid black;">${apc.netMarchingCapacity}</td>
-				</tr>
+				<c:forEach items="${apc.layer}" var="layer" varStatus="counter">
+					<tr style="">
+						<td style="text-align: center; border: 1px solid black;">${counter.index + 1}</td>
+						<td style="text-align: center; border: 1px solid black;">${apc.name}</td>
+						<td style="text-align: center; border: 1px solid black;">${layer.id}</td>
+						<td style="text-align: center; border: 1px solid black;">${layer.marchingCapacity}</td>
+						<td style="text-align: center; border: 1px solid black;">${layer.leadingUnit }</td>
+						<td style="text-align: center; border: 1px solid black;"><c:choose>
+								<c:when test="${not empty layer.hero}">${layer.hero.name}</c:when>
+								<c:otherwise>X</c:otherwise>
+							</c:choose></td>
+						<td style="text-align: center; border: 1px solid black;"></td>
+					</tr>
+				</c:forEach>
 			</c:forEach>
 		</table>
 	</div>

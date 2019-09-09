@@ -81,7 +81,7 @@
 	</div>
 	<div id="body">
 		<table style="border: 1px solid black; padding: 2px;">
-			<caption>Heroes</caption>
+			<caption> Combat Heroes</caption>
 			<tr>
 				<th
 					style="text-align: center; border: 1px solid black; background-color: black; color: white;">
@@ -91,7 +91,7 @@
 					Hero</th>
 				<th
 					style="text-align: center; border: 1px solid black; background-color: black; color: white;">
-					Color</th>
+					Class</th>
 				<th
 					style="text-align: center; border: 1px solid black; background-color: black; color: white;">
 					Leading Unit</th>
@@ -139,44 +139,43 @@
 					Bulwark</th>
 			</tr>
 			<c:forEach items="${heroDetails}" var="hero" varStatus="counter">
-				<tr
-					style="background-color:${fn:toLowerCase(hero.details.color)};<c:choose><c:when test="${hero.details.color eq purple}">color:white;</c:when></c:choose>">
+				<tr>
 					<td style="text-align: center; border: 1px solid black;">${counter.index + 1}</td>
-					<td style="text-align: center; border: 1px solid black;">${hero.details.name}</td>
-					<td style="text-align: center; border: 1px solid black;">${hero.details.color}</td>
-					<td style="text-align: center; border: 1px solid black;">${hero.stats.leadingUnit}</td>
+					<td style="text-align: center; border: 1px solid black;">${hero.name}</td>
+					<td style="text-align: center; border: 1px solid black;">${hero.heroClass}</td>
+					<td style="text-align: center; border: 1px solid black;">${hero.leadingUnit}</td>
 					<td style="text-align: center; border: 1px solid black;"><fmt:formatNumber
 							type="number" maxFractionDigits="2"
-							value="${hero.stats.marchingCapacity}" /></td>
+							value="${hero.marchingCapacity}" /></td>
 					<td style="text-align: center; border: 1px solid black;"><fmt:formatNumber
-							type="number" maxFractionDigits="2" value="${hero.stats.damage}" /></td>
-					<td style="text-align: center; border: 1px solid black;">${hero.stats.range}</td>
-					<td style="text-align: center; border: 1px solid black;"><fmt:formatNumber
-							type="number" maxFractionDigits="2"
-							value="${hero.stats.resitance}" /></td>
-					<td style="text-align: center; border: 1px solid black;"><fmt:formatNumber
-							type="number" maxFractionDigits="2" value="${hero.stats.might}" /></td>
+							type="number" maxFractionDigits="2" value="${hero.damage}" /></td>
+					<td style="text-align: center; border: 1px solid black;">${hero.range}</td>
 					<td style="text-align: center; border: 1px solid black;"><fmt:formatNumber
 							type="number" maxFractionDigits="2"
-							value="${hero.stats.lowerMight}" /></td>
+							value="${hero.lowerResistance}" /></td>
+					<td style="text-align: center; border: 1px solid black;"><fmt:formatNumber
+							type="number" maxFractionDigits="2" value="${hero.might}" /></td>
 					<td style="text-align: center; border: 1px solid black;"><fmt:formatNumber
 							type="number" maxFractionDigits="2"
-							value="${hero.stats.lowerResistance}" /></td>
-					<td style="text-align: center; border: 1px solid black;"><fmt:formatNumber
-							type="number" maxFractionDigits="2" value="${hero.stats.hp}" /></td>
-					<td style="text-align: center; border: 1px solid black;">${hero.stats.minusEnemyTurns}</td>
+							value="${hero.lowerMight}" /></td>
 					<td style="text-align: center; border: 1px solid black;"><fmt:formatNumber
 							type="number" maxFractionDigits="2"
-							value="${hero.stats.lowerDamage}" /></td>
-					<td style="text-align: center; border: 1px solid black;">${hero.stats.combatSpeed}</td>
+							value="${hero.lowerResistance}" /></td>
+					<td style="text-align: center; border: 1px solid black;"><fmt:formatNumber
+							type="number" maxFractionDigits="2" value="" /></td>
+					<td style="text-align: center; border: 1px solid black;">${hero.minusEnemyTurns}</td>
 					<td style="text-align: center; border: 1px solid black;"><fmt:formatNumber
 							type="number" maxFractionDigits="2"
-							value="${hero.stats.seigeMight}" /></td>
+							value="${hero.lowerEnemyDamage}" /></td>
+					<td style="text-align: center; border: 1px solid black;">${hero.combatSpeed}</td>
 					<td style="text-align: center; border: 1px solid black;"><fmt:formatNumber
 							type="number" maxFractionDigits="2"
-							value="${hero.stats.seigeDefenseMight}" /></td>
+							value="${hero.seigeMight}" /></td>
 					<td style="text-align: center; border: 1px solid black;"><fmt:formatNumber
-							type="number" maxFractionDigits="2" value="${hero.stats.bulwark}" /></td>
+							type="number" maxFractionDigits="2"
+							value="${hero.seigeDefenseMight}" /></td>
+					<td style="text-align: center; border: 1px solid black;"><fmt:formatNumber
+							type="number" maxFractionDigits="2" value="${hero.bulwark}" /></td>
 				</tr>
 			</c:forEach>
 		</table>

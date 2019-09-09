@@ -12,23 +12,31 @@ import javax.annotation.Resource;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import in.indigenous.common.util.io.FileReader;
-import in.indigenous.last.shelter.models.AccountHeroData;
-import in.indigenous.last.shelter.models.AdditionalDamage;
-import in.indigenous.last.shelter.models.Damage;
-import in.indigenous.last.shelter.models.HeroData;
-import in.indigenous.last.shelter.models.HeroDetails;
-import in.indigenous.last.shelter.models.HeroSkills;
-import in.indigenous.last.shelter.models.HeroStats;
-import in.indigenous.last.shelter.models.LowerDamage;
-import in.indigenous.last.shelter.models.LowerResistance;
-import in.indigenous.last.shelter.models.MinusEnemyTurns;
-import in.indigenous.last.shelter.models.MinusMight;
+import in.indigenous.last.shelter.models.hero.CombatHero;
+import in.indigenous.last.shelter.models.hero.Hero;
+import in.indigenous.last.shelter.models.hero.HeroClass;
+import in.indigenous.last.shelter.models.hero.skills.HeroSkill;
+import in.indigenous.last.shelter.models.hero.skills.HeroSkillClass;
+import in.indigenous.last.shelter.models.hero.skills.combat.CombatHeroSkill;
+import in.indigenous.last.shelter.models.hero.skills.combat.CombatSkill;
+import in.indigenous.last.shelter.models.hero.skills.combat.CombatSkillType;
+import in.indigenous.last.shelter.models.hero.skills.combat.LeadershipSkill;
+import in.indigenous.last.shelter.models.hero.skills.combat.LeadingUnit;
+import in.indigenous.last.shelter.models.hero.skills.combat.MinusDamage;
+import in.indigenous.last.shelter.models.hero.skills.combat.MinusMight;
+import in.indigenous.last.shelter.models.hero.skills.combat.MinusResistance;
+import in.indigenous.last.shelter.models.hero.skills.combat.MinusTurns;
+import in.indigenous.last.shelter.models.hero.skills.combat.PlusDamage;
 
 @Component
 public class HeroUtils {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(HeroUtils.class);
 
 	@Resource
 	private FileReader excelFileReader;
@@ -45,12 +53,12 @@ public class HeroUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public List<HeroData> getGlobalHeroData(String dataDir, String fileName, String heroSheetName,
+	public List<Hero> getGlobalHeroData(String dataDir, String fileName, String heroSheetName,
 			String heroSkillsSheetName) throws IOException {
 		Map<Object, List<Object>> rawData = excelFileReader.readExcelSheet(dataDir, fileName, heroSheetName);
 		List<String> keys = new ArrayList<>(Arrays.asList(StringUtils.split(HERO_DETAILS_KEYS, ",")));
 
-		Map<Integer, HeroData> heroDataMap = new HashMap<>();
+		Map<Integer, Hero> heroDataMap = new HashMap<>();
 		List<String> idValues = rawData.get(keys.get(0)).stream().map(el -> {
 			return String.valueOf(el);
 		}).collect(Collectors.toList());
@@ -63,23 +71,26 @@ public class HeroUtils {
 
 		idValues.stream().forEach(idValue -> {
 			int index = idValues.indexOf(idValue);
-			HeroDetails detail = new HeroDetails();
+			Hero hero = new CombatHero();
 			int id = Double.valueOf(idValues.get(index)).intValue();
-			detail.setId(id);
-			HeroData data = new HeroData();
-			data.setDetails(detail);
-			heroDataMap.put(id, data);
+			hero.setId(id);
+			heroDataMap.put(id, hero);
 		});
 		idValues.stream().forEach(idValue -> {
 			int index = idValues.indexOf(idValue);
-			heroDataMap.get(index + 1).getDetails().setName(nameValues.get(index));
+			heroDataMap.get(index + 1).setName(nameValues.get(index));
 		});
 		idValues.stream().forEach(idValue -> {
 			int index = idValues.indexOf(idValue);
-			heroDataMap.get(index + 1).getDetails().setColor(colorValues.get(index));
+			heroDataMap.get(index + 1).setHeroClass(HeroClass.valueOf(colorValues.get(index).toUpperCase()));
 		});
 		for (int id : heroDataMap.keySet()) {
-			heroDataMap.get(id).setStats(getHeroStats(dataDir, fileName, heroSkillsSheetName, id));
+			Hero hero = heroDataMap.get(id);
+			if (hero == null) {
+				hero = new CombatHero();
+				heroDataMap.put(id, hero);
+			}
+			getCombatHeroStats(dataDir, fileName, heroSkillsSheetName, id, hero);
 		}
 		return new ArrayList<>(heroDataMap.values());
 	}
@@ -94,27 +105,27 @@ public class HeroUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public Map<Integer, List<AccountHeroData>> getAccountHeroData(String dataDir, String fileName, String sheetName,
+	public Map<Integer, List<HeroSkill>> getAccountHeroSkill(String dataDir, String fileName, String sheetName,
 			int account) throws IOException {
 		List<List<Object>> rawData = excelFileReader.readRows(dataDir, fileName, sheetName);
-		Map<Integer, List<AccountHeroData>> accountHeroDataMap = new HashMap<>();
+		Map<Integer, List<HeroSkill>> accountHeroDataMap = new HashMap<>();
 		if (CollectionUtils.isNotEmpty(rawData)) {
 			for (List<Object> row : rawData) {
 				int heroId = Double.valueOf(row.get(0).toString()).intValue();
+
+				// Check how to update hero level.
 				int heroLvl = Double.valueOf(row.get(1).toString()).intValue();
 				int skillId = Double.valueOf(row.get(2).toString()).intValue();
 				int skillLvl = Double.valueOf(row.get(3).toString()).intValue();
-				List<AccountHeroData> list = accountHeroDataMap.get(heroId);
+				List<HeroSkill> list = accountHeroDataMap.get(heroId);
 				if (list == null) {
 					list = new ArrayList<>();
 					accountHeroDataMap.put(heroId, list);
 				}
-				AccountHeroData data = new AccountHeroData();
-				data.setHeroId(heroId);
-				data.setHeroLevel(heroLvl);
-				data.setSkillId(skillId);
-				data.setSkillLevel(skillLvl);
-				list.add(data);
+				HeroSkill skill = new CombatSkill();
+				skill.setSkillId(skillId);
+				skill.setLevel(skillLvl);
+				list.add(skill);
 			}
 		}
 		return accountHeroDataMap;
@@ -130,9 +141,8 @@ public class HeroUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	private HeroStats getHeroStats(String dataDir, String fileName, String skillSheetName, int heroId)
+	private void getCombatHeroStats(String dataDir, String fileName, String skillSheetName, int heroId, Hero hero)
 			throws IOException {
-		HeroStats stats = new HeroStats();
 		List<List<Object>> rawData = excelFileReader.readRows(dataDir, fileName, skillSheetName);
 		if (CollectionUtils.isNotEmpty(rawData)) {
 			List<List<Object>> skillset = new ArrayList<>();
@@ -141,142 +151,166 @@ public class HeroUtils {
 					skillset.add(row);
 				}
 			}
-			List<HeroSkills> skills = new ArrayList<>();
-			Map<Integer, HeroSkills> skillMap = new HashMap<>();
+			List<HeroSkill> skills = new ArrayList<>();
+			Map<Integer, CombatHeroSkill> skillMap = new HashMap<>();
 			for (List<Object> obj : skillset) {
-				HeroSkills skill = skillMap.get(obj.get(1));
+				CombatHeroSkill skill = skillMap.get(obj.get(0));
+				CombatSkillType skillType = CombatSkillType.valueOf(obj.get(2).toString().toUpperCase());
 				if (skill == null) {
-					skill = new HeroSkills();
-					skillMap.put(Double.valueOf(obj.get(1).toString()).intValue(), skill);
-				}
-				if (obj.size() > 2 && obj.get(1) != null && StringUtils.isNotEmpty(obj.get(1).toString())) {
-					skill.setId(Double.valueOf(obj.get(1).toString()).intValue());
-				}
-				if (obj.size() > 3 && obj.get(2) != null && StringUtils.isNotEmpty(obj.get(2).toString())) {
-					skill.setName(obj.get(2).toString());
-				}
-				skill.setLevel(Double.valueOf(obj.get(3).toString()).intValue());
-				if (obj.size() > 4 && obj.get(4) != null && StringUtils.isNotEmpty(obj.get(4).toString())) {
-					skill.setRange(Double.valueOf(obj.get(4).toString()).intValue());
-				}
-				if (obj.size() > 5 && obj.get(5) != null && StringUtils.isNotEmpty(obj.get(5).toString())) {
-					skill.setLeadingUnit(obj.get(5).toString());
-				}
-				if (obj.size() > 7 && obj.get(7) != null && StringUtils.isNotEmpty(obj.get(7).toString())) {
-					skill.setMarchingCapacity(obj.get(7).toString());
-				}
-				if (obj.size() > 8 && obj.get(8) != null && StringUtils.isNotEmpty(obj.get(8).toString())) {
-					String damageStr = obj.get(8).toString();
-					String turnString = "";
-					if (StringUtils.contains(damageStr, "turn")) {
-						String[] placeholder = damageStr.split("turn");
-						damageStr = placeholder[0].trim();
-						turnString = placeholder[1].trim();
+					if (CombatSkillType.COMBAT.equals(skillType)) {
+						skill = new CombatSkill();
 					}
-					Damage damage = new Damage();
-					damage.setDamage(damageStr);
-					if (StringUtils.isNotEmpty(turnString)) {
-						damage.setTurns(new ArrayList<>(Arrays.asList(turnString.split(","))).stream().map(t -> {
-							return Integer.parseInt(t);
-						}).collect(Collectors.toList()));
+					if (CombatSkillType.LEADERSHIP.equals(skillType)) {
+						skill = new LeadershipSkill();
 					}
-					if (obj.size() > 9 && obj.get(9) != null && StringUtils.isNotEmpty(obj.get(9).toString())) {
-						damage.setMinusTurns(Double.valueOf(obj.get(9).toString()).intValue());
+					skillMap.put(Double.valueOf(obj.get(0).toString()).intValue(), skill);
+				}
+				if (obj.size() > 1 && obj.get(1) != null && StringUtils.isNotEmpty(obj.get(1).toString())) {
+					skill.setSkillId(Double.valueOf(obj.get(1).toString()).intValue());
+				}
+				if (obj.size() > 2 && obj.get(2) != null && StringUtils.isNotEmpty(obj.get(2).toString())) {
+					skill.setType(CombatSkillType.valueOf(obj.get(2).toString()));
+				}
+				if (obj.size() > 3 && obj.get(3) != null && StringUtils.isNotEmpty(obj.get(3).toString())) {
+					skill.setName(obj.get(3).toString());
+				}
+				skill.setLevel(Double.valueOf(obj.get(4).toString()).intValue());
+				LOGGER.debug(" ------------------------------------------------- ");
+				LOGGER.debug("Started processing skill ----------------> level: " + obj.get(4).toString() + ", id: "
+						+ obj.get(1).toString() + ", type: " + skillType);
+				if (CombatSkillType.COMBAT.equals(skillType)) {
+					CombatSkill cSkill = (CombatSkill) skill;
+					cSkill.setSkillClass(HeroSkillClass.COMBAT);
+					if (obj.size() > 5 && obj.get(5) != null && StringUtils.isNotEmpty(obj.get(5).toString())) {
+						cSkill.setRange(Double.valueOf(obj.get(5).toString()).intValue());
 					}
 					if (obj.size() > 6 && obj.get(6) != null && StringUtils.isNotEmpty(obj.get(6).toString())) {
-						damage.setTargetUnit(Double.valueOf(obj.get(6).toString()).intValue());
+						cSkill.setLeadingUnit(LeadingUnit.valueOf(obj.get(6).toString().toUpperCase()));
 					}
-					if (obj.size() > 10 && obj.get(10) != null && StringUtils.isNotEmpty(obj.get(10).toString())) {
-						MinusMight minusMight = new MinusMight();
-						minusMight.setMinusMight(Double.valueOf(obj.get(10).toString()));
-						if (obj.size() > 11 && obj.get(11) != null && StringUtils.isNotEmpty(obj.get(11).toString())) {
-							minusMight.setTurns(Double.valueOf(obj.get(11).toString()).intValue());
+					if (obj.size() > 7 && obj.get(7) != null && StringUtils.isNotEmpty(obj.get(7).toString())) {
+						cSkill.setTargetUnit(Double.valueOf((obj.get(7).toString().toUpperCase())).intValue());
+					}
+					if (obj.size() > 9 && obj.get(9) != null && StringUtils.isNotEmpty(obj.get(9).toString())) {
+						String damageStr = obj.get(9).toString();
+						String turnString = "";
+						if (StringUtils.contains(damageStr, "turn")) {
+							String[] placeholder = damageStr.split("turn");
+							damageStr = placeholder[0].trim();
+							turnString = placeholder[1].trim();
 						}
-						damage.setMinusMight(minusMight);
-					}
-					skill.setDamage(damage);
-				}
-				if (obj.size() > 12 && obj.get(12) != null && StringUtils.isNotEmpty(obj.get(12).toString())) {
-					skill.setResitance(Double.valueOf(obj.get(12).toString()));
-				}
-				if (obj.size() > 13 && obj.get(13) != null && StringUtils.isNotEmpty(obj.get(13).toString())) {
-					skill.setMight(Double.valueOf(obj.get(13).toString()));
-				}
-				if (obj.size() > 14 && obj.get(14) != null && StringUtils.isNotEmpty(obj.get(14).toString())) {
-					LowerResistance lowerResistance = new LowerResistance();
-					lowerResistance.setLowerResistance(Double.valueOf(obj.get(14).toString()));
-					if (obj.size() > 15 && obj.get(15) != null && StringUtils.isNotEmpty(obj.get(15).toString())) {
-						lowerResistance.setTurns(Double.valueOf(obj.get(15).toString()).intValue());
-					}
-					skill.setLowerResistance(lowerResistance);
-				}
-				if (obj.size() > 16 && obj.get(16) != null && StringUtils.isNotEmpty(obj.get(16).toString())) {
-					skill.setHp(Double.valueOf(obj.get(16).toString()));
-				}
-				if (obj.size() > 17 && obj.get(17) != null && StringUtils.isNotEmpty(obj.get(17).toString())) {
-					MinusEnemyTurns minusEnemyTurns = new MinusEnemyTurns();
-					String minusEnemyStr = obj.get(17).toString();
-					if (minusEnemyStr.contains("chance") || minusEnemyStr.contains("turn")) {
-						if (minusEnemyStr.contains("chance")) {
-							String[] chanceStr = minusEnemyStr.split("chance");
-							Double chance = Double.valueOf(chanceStr[0].trim());
-							minusEnemyTurns.setChance(chance);
-							minusEnemyStr = chanceStr[1].trim();
+						cSkill.setDamage(damageStr);
+						if (StringUtils.isNotEmpty(turnString)) {
+							cSkill.setTurns(new ArrayList<>(Arrays.asList(turnString.split(","))).stream().map(t -> {
+								return Integer.parseInt(t);
+							}).collect(Collectors.toList()));
 						}
-						if (minusEnemyStr.contains("turn")) {
-							String[] turnStr = minusEnemyStr.split("turn");
-							Integer unit = Integer.valueOf(turnStr[0].trim());
-							minusEnemyTurns.setUnits(unit);
-							List<Integer> turns = new ArrayList<>(Arrays.asList(turnStr[1].trim().split(","))).stream()
-									.map(t -> {
-										return Integer.valueOf(t);
-									}).collect(Collectors.toList());
-							minusEnemyTurns.setTurns(turns);
-							if (obj.size() > 18 && obj.get(18) != null
-									&& StringUtils.isNotEmpty(obj.get(18).toString())) {
-								minusEnemyTurns.setMinusTurns(Double.valueOf(obj.get(18).toString()).intValue());
+						if (obj.size() > 10 && obj.get(10) != null && StringUtils.isNotEmpty(obj.get(10).toString())) {
+							MinusMight minusMight = new MinusMight();
+							minusMight.setMight(Double.valueOf(obj.get(10).toString()));
+							if (obj.size() > 11 && obj.get(11) != null
+									&& StringUtils.isNotEmpty(obj.get(11).toString())) {
+								minusMight.setTurns(Double.valueOf(obj.get(11).toString()).intValue());
 							}
+							cSkill.setEnemyMinusMight(minusMight);
 						}
-					} else {
-						minusEnemyTurns.setMinusTurns(Double.valueOf(minusEnemyStr).intValue());
+						LOGGER.debug("Processing damage for hero: " + heroId + ", skill: " + cSkill.getSkillId()
+								+ ", damage string: " + cSkill.getDamage() + ", turs: " + cSkill.getTurns()
+								);
 					}
-					skill.setMinusEnemyTurns(minusEnemyTurns);
-				}
-				if (obj.size() > 19 && obj.get(19) != null && StringUtils.isNotEmpty(obj.get(19).toString())) {
-					LowerDamage lowerDamage = new LowerDamage();
-					lowerDamage.setDamage(obj.get(19).toString());
+					if (obj.size() > 15 && obj.get(15) != null && StringUtils.isNotEmpty(obj.get(15).toString())) {
+						MinusResistance minusResistance = new MinusResistance();
+						minusResistance.setResistance(Double.valueOf(obj.get(15).toString()));
+						if (obj.size() > 16 && obj.get(16) != null && StringUtils.isNotEmpty(obj.get(16).toString())) {
+							minusResistance.setTurns(Double.valueOf(obj.get(16).toString()).intValue());
+						}
+						cSkill.setEnemyMinusResistance(minusResistance);
+					}
+					// TODO - Update the value of hp.
+					if (obj.size() > 17 && obj.get(17) != null && StringUtils.isNotEmpty(obj.get(17).toString())) {
+						// cSkill.setHp(Double.valueOf(obj.get(16).toString()));
+					}
+					if (obj.size() > 18 && obj.get(18) != null && StringUtils.isNotEmpty(obj.get(18).toString())) {
+						MinusTurns minusEnemyTurns = new MinusTurns();
+						String minusEnemyStr = obj.get(18).toString();
+						if (minusEnemyStr.contains("chance") || minusEnemyStr.contains("turn")) {
+							if (minusEnemyStr.contains("chance")) {
+								String[] chanceStr = minusEnemyStr.split("chance");
+								Double chance = Double.valueOf(chanceStr[0].trim());
+								minusEnemyTurns.setChance(chance);
+								minusEnemyStr = chanceStr[1].trim();
+							}
+							if (minusEnemyStr.contains("turn")) {
+								String[] turnStr = minusEnemyStr.split("turn");
+								Integer unit = Integer.valueOf(turnStr[0].trim());
+								minusEnemyTurns.setUnits(unit);
+								List<Integer> turns = new ArrayList<>(Arrays.asList(turnStr[1].trim().split(",")))
+										.stream().map(t -> {
+											return Integer.valueOf(t);
+										}).collect(Collectors.toList());
+								minusEnemyTurns.setTurns(turns);
+								if (obj.size() > 19 && obj.get(19) != null
+										&& StringUtils.isNotEmpty(obj.get(19).toString())) {
+									minusEnemyTurns.setMinusTurns(Double.valueOf(obj.get(19).toString()).intValue());
+								}
+							}
+						} else {
+							minusEnemyTurns.setMinusTurns(Double.valueOf(minusEnemyStr).intValue());
+						}
+						cSkill.setEnemyMinusTurns(minusEnemyTurns);
+					}
 					if (obj.size() > 20 && obj.get(20) != null && StringUtils.isNotEmpty(obj.get(20).toString())) {
-						lowerDamage.setUnits(Double.valueOf(obj.get(20).toString()).intValue());
+						MinusDamage minusDamage = new MinusDamage();
+						minusDamage.setDamage(obj.get(20).toString());
+						if (obj.size() > 21 && obj.get(21) != null && StringUtils.isNotEmpty(obj.get(21).toString())) {
+							minusDamage.setUnits(Double.valueOf(obj.get(21).toString()).intValue());
+						}
+						if (obj.size() > 22 && obj.get(22) != null && StringUtils.isNotEmpty(obj.get(22).toString())) {
+							minusDamage.setTurns(Double.valueOf(obj.get(22).toString()).intValue());
+						}
+						cSkill.setEnemyMinusDamage(minusDamage);
 					}
-					if (obj.size() > 21 && obj.get(21) != null && StringUtils.isNotEmpty(obj.get(21).toString())) {
-						lowerDamage.setTurns(Double.valueOf(obj.get(21).toString()).intValue());
-					}
-					skill.setLowerDamage(lowerDamage);
-				}
-				if (obj.size() > 22 && obj.get(22) != null && StringUtils.isNotEmpty(obj.get(22).toString())) {
-					AdditionalDamage additionalDamage = new AdditionalDamage();
-					additionalDamage.setDamage(Double.valueOf(obj.get(22).toString()).intValue());
 					if (obj.size() > 23 && obj.get(23) != null && StringUtils.isNotEmpty(obj.get(23).toString())) {
-						additionalDamage.setTurns(Double.valueOf(obj.get(23).toString()).intValue());
+						PlusDamage additionalDamage = new PlusDamage();
+						additionalDamage.setDamage(Double.valueOf(obj.get(23).toString()).intValue());
+						if (obj.size() > 24 && obj.get(24) != null && StringUtils.isNotEmpty(obj.get(24).toString())) {
+							additionalDamage.setTurns(Double.valueOf(obj.get(24).toString()).intValue());
+						}
+						cSkill.setAdditionalDamage(additionalDamage);
 					}
-					skill.setAdditionalDamage(additionalDamage);
+					// TODO - Check and update this value.
+					if (obj.size() > 25 && obj.get(25) != null && StringUtils.isNotEmpty(obj.get(25).toString())) {
+						// cSkill.setCombatSpeed(Double.valueOf(obj.get(24).toString()).intValue());
+					}
+					LOGGER.debug(" Combat skill processed ---> " + " level: " + obj.get(4).toString() + ", id: "
+							+ obj.get(1).toString() + ", type: " + skillType);
+				} else if (CombatSkillType.LEADERSHIP.equals(skillType)) {
+					skill.setSkillClass(HeroSkillClass.COMBAT);
+					LeadershipSkill lskill = (LeadershipSkill) skill;
+					if (obj.size() > 8 && obj.get(8) != null && StringUtils.isNotEmpty(obj.get(8).toString())) {
+						lskill.setMarchingCapacity(obj.get(8).toString());
+					}
+					if (obj.size() > 13 && obj.get(13) != null && StringUtils.isNotEmpty(obj.get(13).toString())) {
+						lskill.setResistance(Double.valueOf(obj.get(13).toString()).doubleValue());
+					}
+					if (obj.size() > 14 && obj.get(14) != null && StringUtils.isNotEmpty(obj.get(14).toString())) {
+						lskill.setMight(Double.valueOf(obj.get(14).toString()).doubleValue());
+					}
+					if (obj.size() > 26 && obj.get(26) != null && StringUtils.isNotEmpty(obj.get(26).toString())) {
+						lskill.setSeigeMight(Double.valueOf(obj.get(26).toString()));
+					}
+					if (obj.size() > 27 && obj.get(27) != null && StringUtils.isNotEmpty(obj.get(27).toString())) {
+						lskill.setSeigeDefenseMight(Double.valueOf(obj.get(27).toString()));
+					}
+					if (obj.size() > 28 && obj.get(28) != null && StringUtils.isNotEmpty(obj.get(28).toString())) {
+						lskill.setBulwark(Double.valueOf(obj.get(28).toString()));
+					}
+					LOGGER.debug(" Leadership skill processed ---> " + " level: " + obj.get(4).toString() + ", id: "
+							+ obj.get(1).toString() + ", type: " + skillType);
 				}
-				if (obj.size() > 24 && obj.get(24) != null && StringUtils.isNotEmpty(obj.get(24).toString())) {
-					skill.setCombatSpeed(Double.valueOf(obj.get(24).toString()).intValue());
-				}
-				if (obj.size() > 25 && obj.get(25) != null && StringUtils.isNotEmpty(obj.get(25).toString())) {
-					skill.setSeigeMight(Double.valueOf(obj.get(25).toString()));
-				}
-				if (obj.size() > 26 && obj.get(26) != null && StringUtils.isNotEmpty(obj.get(26).toString())) {
-					skill.setSeigeDefenseMight(Double.valueOf(obj.get(26).toString()));
-				}
-				if (obj.size() > 27 && obj.get(27) != null && StringUtils.isNotEmpty(obj.get(27).toString())) {
-					skill.setBulwark(Double.valueOf(obj.get(27).toString()));
-				}
+				LOGGER.debug(" ------------------------------------------------- ");
 				skills.add(skill);
 			}
-			stats.setSkills(skills);
+			hero.setSkills(skills);
 		}
-		return stats;
 	}
 }
