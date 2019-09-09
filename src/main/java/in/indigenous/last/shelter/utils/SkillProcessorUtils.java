@@ -10,10 +10,6 @@ import org.springframework.stereotype.Component;
 
 import in.indigenous.last.shelter.models.hero.Hero;
 import in.indigenous.last.shelter.models.hero.skills.HeroSkill;
-import in.indigenous.last.shelter.models.hero.skills.HeroSkillClass;
-import in.indigenous.last.shelter.models.hero.skills.combat.CombatHeroSkill;
-import in.indigenous.last.shelter.models.hero.skills.combat.CombatSkill;
-import in.indigenous.last.shelter.models.hero.skills.combat.CombatSkillType;
 import in.indigenous.last.shelter.processors.skills.SkillProcessor;
 import in.indigenous.last.shelter.view.CombatHero;
 
@@ -48,58 +44,6 @@ public class SkillProcessorUtils {
 				p.processCombatHero(skills, skill, heroView);
 			}
 		});
-	}
-
-
-	/**
-	 * Process HP.
-	 * 
-	 * @param skills
-	 * @param skillLevel
-	 * @return
-	 */
-	private double processHp(List<HeroSkill> glbHeroSkills, HeroSkill targetSkill, CombatHero heroView) {
-		double hp = 0.0d;
-		HeroSkill skill = glbHeroSkills.stream().filter(sk -> {
-			return sk.getSkillId() == targetSkill.getSkillId();
-		}).filter(sk -> {
-			return sk.getLevel() == targetSkill.getLevel();
-		}).findFirst().get();
-		if (HeroSkillClass.COMBAT.equals(skill.getSkillClass())) {
-			CombatHeroSkill combatSkill = (CombatHeroSkill) skill;
-			if (CombatSkillType.COMBAT.equals(combatSkill.getType())) {
-				CombatSkill cskill = (CombatSkill) skill;
-				// TODO - Update hp.
-				/*
-				 * if (skill.getHp() > 0) { hp += skill.getHp(); }
-				 */
-			}
-		}
-		return hp;
-	}
-
-	/**
-	 * Process Combat Speed.
-	 * 
-	 * @param skills
-	 * @param skillLevel
-	 * @return
-	 */
-	private int processCombatSpeed(List<HeroSkill> glbHeroSkills, HeroSkill targetSkill, CombatHero heroView) {
-		HeroSkill skill = glbHeroSkills.stream().filter(sk -> {
-			return sk.getSkillId() == targetSkill.getSkillId();
-		}).filter(sk -> {
-			return sk.getLevel() == targetSkill.getLevel();
-		}).findFirst().get();
-		if (HeroSkillClass.COMBAT.equals(skill.getSkillClass())) {
-			CombatHeroSkill combatSkill = (CombatHeroSkill) skill;
-			if (CombatSkillType.COMBAT.equals(combatSkill.getType())) {
-				CombatSkill cskill = (CombatSkill) skill;
-				// Update combat speed.
-				// return cskill.get
-			}
-		}
-		return 0;
 	}
 
 }

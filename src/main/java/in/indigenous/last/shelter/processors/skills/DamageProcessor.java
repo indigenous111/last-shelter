@@ -71,7 +71,9 @@ public class DamageProcessor implements SkillProcessor {
 			}
 		}
 		heroView.setDamage(heroView.getDamage() + damage);
-		heroView.setRange(heroView.getRange() + cskill.getRange());
+		if(cskill.getRange() > heroView.getRange()) {
+			heroView.setRange(cskill.getRange());
+		}
 		if (StringUtils.isEmpty(heroView.getLeadingUnit()) && cskill.getLeadingUnit() != null
 				&& StringUtils.isNotEmpty(cskill.getLeadingUnit().name())) {
 			heroView.setLeadingUnit(cskill.getLeadingUnit().name());

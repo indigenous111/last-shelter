@@ -52,6 +52,7 @@ public class APCUtils {
 			}
 			APCLayer apcLayer = new APCLayer();
 			apcLayer.setId(layer);
+			apcLayer.setHero(apcLayerHero);
 			Troop troop = new Troop();
 			troop.setTroopClass(leadingTroop);
 			TroopDetails troopDetails = new TroopDetails();

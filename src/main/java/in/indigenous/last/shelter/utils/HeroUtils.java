@@ -112,7 +112,6 @@ public class HeroUtils {
 		if (CollectionUtils.isNotEmpty(rawData)) {
 			for (List<Object> row : rawData) {
 				int heroId = Double.valueOf(row.get(0).toString()).intValue();
-
 				// Check how to update hero level.
 				int heroLvl = Double.valueOf(row.get(1).toString()).intValue();
 				int skillId = Double.valueOf(row.get(2).toString()).intValue();
@@ -125,6 +124,7 @@ public class HeroUtils {
 				HeroSkill skill = new CombatSkill();
 				skill.setSkillId(skillId);
 				skill.setLevel(skillLvl);
+				skill.setHeroLevel(heroLvl);
 				list.add(skill);
 			}
 		}
@@ -175,9 +175,6 @@ public class HeroUtils {
 					skill.setName(obj.get(3).toString());
 				}
 				skill.setLevel(Double.valueOf(obj.get(4).toString()).intValue());
-				LOGGER.debug(" ------------------------------------------------- ");
-				LOGGER.debug("Started processing skill ----------------> level: " + obj.get(4).toString() + ", id: "
-						+ obj.get(1).toString() + ", type: " + skillType);
 				if (CombatSkillType.COMBAT.equals(skillType)) {
 					CombatSkill cSkill = (CombatSkill) skill;
 					cSkill.setSkillClass(HeroSkillClass.COMBAT);
@@ -213,9 +210,6 @@ public class HeroUtils {
 							}
 							cSkill.setEnemyMinusMight(minusMight);
 						}
-						LOGGER.debug("Processing damage for hero: " + heroId + ", skill: " + cSkill.getSkillId()
-								+ ", damage string: " + cSkill.getDamage() + ", turs: " + cSkill.getTurns()
-								);
 					}
 					if (obj.size() > 15 && obj.get(15) != null && StringUtils.isNotEmpty(obj.get(15).toString())) {
 						MinusResistance minusResistance = new MinusResistance();
@@ -224,10 +218,6 @@ public class HeroUtils {
 							minusResistance.setTurns(Double.valueOf(obj.get(16).toString()).intValue());
 						}
 						cSkill.setEnemyMinusResistance(minusResistance);
-					}
-					// TODO - Update the value of hp.
-					if (obj.size() > 17 && obj.get(17) != null && StringUtils.isNotEmpty(obj.get(17).toString())) {
-						// cSkill.setHp(Double.valueOf(obj.get(16).toString()));
 					}
 					if (obj.size() > 18 && obj.get(18) != null && StringUtils.isNotEmpty(obj.get(18).toString())) {
 						MinusTurns minusEnemyTurns = new MinusTurns();
@@ -277,12 +267,12 @@ public class HeroUtils {
 						}
 						cSkill.setAdditionalDamage(additionalDamage);
 					}
-					// TODO - Check and update this value.
-					if (obj.size() > 25 && obj.get(25) != null && StringUtils.isNotEmpty(obj.get(25).toString())) {
-						// cSkill.setCombatSpeed(Double.valueOf(obj.get(24).toString()).intValue());
+					if (obj.size() > 27 && obj.get(27) != null && StringUtils.isNotEmpty(obj.get(27).toString())) {
+						cSkill.setSeigeDefenseMight(Double.valueOf(obj.get(27).toString()));
 					}
-					LOGGER.debug(" Combat skill processed ---> " + " level: " + obj.get(4).toString() + ", id: "
-							+ obj.get(1).toString() + ", type: " + skillType);
+					if (obj.size() > 28 && obj.get(28) != null && StringUtils.isNotEmpty(obj.get(28).toString())) {
+						cSkill.setBulwark(Double.valueOf(obj.get(28).toString()));
+					}
 				} else if (CombatSkillType.LEADERSHIP.equals(skillType)) {
 					skill.setSkillClass(HeroSkillClass.COMBAT);
 					LeadershipSkill lskill = (LeadershipSkill) skill;
@@ -295,19 +285,16 @@ public class HeroUtils {
 					if (obj.size() > 14 && obj.get(14) != null && StringUtils.isNotEmpty(obj.get(14).toString())) {
 						lskill.setMight(Double.valueOf(obj.get(14).toString()).doubleValue());
 					}
+					if (obj.size() > 17 && obj.get(17) != null && StringUtils.isNotEmpty(obj.get(17).toString())) {
+						lskill.setHp(Double.valueOf(obj.get(17).toString()));
+					}
+					if (obj.size() > 25 && obj.get(25) != null && StringUtils.isNotEmpty(obj.get(25).toString())) {
+						lskill.setCombatSpeed(Double.valueOf(obj.get(25).toString()).intValue());
+					}
 					if (obj.size() > 26 && obj.get(26) != null && StringUtils.isNotEmpty(obj.get(26).toString())) {
 						lskill.setSeigeMight(Double.valueOf(obj.get(26).toString()));
 					}
-					if (obj.size() > 27 && obj.get(27) != null && StringUtils.isNotEmpty(obj.get(27).toString())) {
-						lskill.setSeigeDefenseMight(Double.valueOf(obj.get(27).toString()));
-					}
-					if (obj.size() > 28 && obj.get(28) != null && StringUtils.isNotEmpty(obj.get(28).toString())) {
-						lskill.setBulwark(Double.valueOf(obj.get(28).toString()));
-					}
-					LOGGER.debug(" Leadership skill processed ---> " + " level: " + obj.get(4).toString() + ", id: "
-							+ obj.get(1).toString() + ", type: " + skillType);
 				}
-				LOGGER.debug(" ------------------------------------------------- ");
 				skills.add(skill);
 			}
 			hero.setSkills(skills);

@@ -99,7 +99,7 @@
 							type="number" maxFractionDigits="2"
 							value="${hero.lowerResistance}" /></td>
 					<td style="text-align: center; border: 1px solid black;"><fmt:formatNumber
-							type="number" maxFractionDigits="2" value="" /></td>
+							type="number" maxFractionDigits="2" value="${hero.hp}" /></td>
 					<td style="text-align: center; border: 1px solid black;">${hero.minusEnemyTurns}</td>
 					<td style="text-align: center; border: 1px solid black;"><fmt:formatNumber
 							type="number" maxFractionDigits="2"

@@ -10,18 +10,23 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import in.indigenous.last.shelter.constants.LastShelterConstants;
 import in.indigenous.last.shelter.models.apc.APC;
 import in.indigenous.last.shelter.models.hero.Hero;
 import in.indigenous.last.shelter.models.hero.skills.HeroSkill;
+import in.indigenous.last.shelter.models.hero.skills.combat.LeadershipSkill;
 import in.indigenous.last.shelter.models.troops.Troop;
 
 @Component
 public class LastShelterCache {
 
 	private final static int NUMBER_OF_ACCOUNTS = 4;
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(LastShelterCache.class);
 
 	private List<Hero> globalHeroData = new ArrayList<>();
 
@@ -56,6 +61,7 @@ public class LastShelterCache {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
 		String accountHeroDataDir = configuration.getString(LastShelterConstants.LAST_SHELTER_ACC_DATA_FILE_DIR) + "//";
 		String accountHeroFileName = configuration.getString(LastShelterConstants.LAST_SHELTER_ACC_HERO_FILE);
 		String accountHeroSheetName = configuration.getString(LastShelterConstants.LAST_SHELTER_ACC_HERO_DETAILS_SHEET);

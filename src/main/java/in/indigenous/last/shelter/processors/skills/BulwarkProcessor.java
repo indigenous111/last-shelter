@@ -6,6 +6,7 @@ import in.indigenous.last.shelter.models.apc.APC;
 import in.indigenous.last.shelter.models.hero.skills.HeroSkill;
 import in.indigenous.last.shelter.models.hero.skills.HeroSkillClass;
 import in.indigenous.last.shelter.models.hero.skills.combat.CombatHeroSkill;
+import in.indigenous.last.shelter.models.hero.skills.combat.CombatSkill;
 import in.indigenous.last.shelter.models.hero.skills.combat.CombatSkillType;
 import in.indigenous.last.shelter.models.hero.skills.combat.LeadershipSkill;
 import in.indigenous.last.shelter.view.CombatHero;
@@ -17,7 +18,7 @@ public class BulwarkProcessor implements SkillProcessor {
 		boolean result = false;
 		if (HeroSkillClass.COMBAT.equals(skill.getSkillClass())) {
 			CombatHeroSkill combatSkill = (CombatHeroSkill) skill;
-			if (CombatSkillType.LEADERSHIP.equals(combatSkill.getType())) {
+			if (CombatSkillType.COMBAT.equals(combatSkill.getType())) {
 				result = true;
 			}
 		}
@@ -32,8 +33,8 @@ public class BulwarkProcessor implements SkillProcessor {
 		}).filter(sk -> {
 			return sk.getLevel() == targetSkill.getLevel();
 		}).findFirst().get();
-		LeadershipSkill lskill = (LeadershipSkill) skill;
-		heroView.setBulwark(heroView.getBulwark() + lskill.getBulwark());
+		CombatSkill cskill = (CombatSkill) skill;
+		heroView.setBulwark(heroView.getBulwark() + cskill.getBulwark());
 	}
 
 	@Override

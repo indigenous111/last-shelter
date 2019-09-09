@@ -18,6 +18,11 @@ public abstract class HeroSkill {
 	private int level;
 
 	/**
+	 * Heroe's level.
+	 */
+	private int heroLevel;
+
+	/**
 	 * Skill class.
 	 */
 	private HeroSkillClass skillClass;
@@ -52,6 +57,14 @@ public abstract class HeroSkill {
 
 	public void setSkillClass(HeroSkillClass skillClass) {
 		this.skillClass = skillClass;
+	}
+
+	public int getHeroLevel() {
+		return heroLevel;
+	}
+
+	public void setHeroLevel(int heroLevel) {
+		this.heroLevel = heroLevel;
 	}
 
 }

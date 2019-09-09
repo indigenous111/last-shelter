@@ -10,9 +10,9 @@ public class LeadershipSkill extends CombatHeroSkill {
 
 	private double seigeMight;
 
-	private double seigeDefenseMight;
+	private double hp;
 
-	private double bulwark;
+	private int combatSpeed;
 
 	public String getMarchingCapacity() {
 		return marchingCapacity;
@@ -46,20 +46,20 @@ public class LeadershipSkill extends CombatHeroSkill {
 		this.seigeMight = seigeMight;
 	}
 
-	public double getSeigeDefenseMight() {
-		return seigeDefenseMight;
+	public double getHp() {
+		return hp;
 	}
 
-	public void setSeigeDefenseMight(double seigeDefenseMight) {
-		this.seigeDefenseMight = seigeDefenseMight;
+	public void setHp(double hp) {
+		this.hp = hp;
 	}
 
-	public double getBulwark() {
-		return bulwark;
+	public int getCombatSpeed() {
+		return combatSpeed;
 	}
 
-	public void setBulwark(double bulwark) {
-		this.bulwark = bulwark;
+	public void setCombatSpeed(int combatSpeed) {
+		this.combatSpeed = combatSpeed;
 	}
 
 }

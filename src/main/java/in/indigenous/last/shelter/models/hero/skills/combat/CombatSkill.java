@@ -32,6 +32,10 @@ public class CombatSkill extends CombatHeroSkill {
 	
 	private LeadingUnit leadingUnit;
 	
+	private double seigeDefenseMight;
+
+	private double bulwark;
+	
 	public int getRange() {
 		return range;
 	}
@@ -135,4 +139,21 @@ public class CombatSkill extends CombatHeroSkill {
 	public void setLeadingUnit(LeadingUnit leadingUnit) {
 		this.leadingUnit = leadingUnit;
 	}
+
+	public double getSeigeDefenseMight() {
+		return seigeDefenseMight;
+	}
+
+	public void setSeigeDefenseMight(double seigeDefenseMight) {
+		this.seigeDefenseMight = seigeDefenseMight;
+	}
+
+	public double getBulwark() {
+		return bulwark;
+	}
+
+	public void setBulwark(double bulwark) {
+		this.bulwark = bulwark;
+	}
+	
 }

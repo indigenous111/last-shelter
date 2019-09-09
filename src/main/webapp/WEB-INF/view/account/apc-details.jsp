@@ -49,7 +49,7 @@
 						<td style="text-align: center; border: 1px solid black;">${apc.name}</td>
 						<td style="text-align: center; border: 1px solid black;">${layer.id}</td>
 						<td style="text-align: center; border: 1px solid black;">${layer.marchingCapacity}</td>
-						<td style="text-align: center; border: 1px solid black;">${layer.leadingUnit }</td>
+						<td style="text-align: center; border: 1px solid black;">${layer.leadingUnit.name}</td>
 						<td style="text-align: center; border: 1px solid black;"><c:choose>
 								<c:when test="${not empty layer.hero}">${layer.hero.name}</c:when>
 								<c:otherwise>X</c:otherwise>

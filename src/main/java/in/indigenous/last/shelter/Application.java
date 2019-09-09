@@ -21,9 +21,11 @@ import org.springframework.context.annotation.ComponentScan;
 import in.indigenous.common.util.io.FileReader;
 import in.indigenous.common.util.io.excel.XLSXFileReader;
 import in.indigenous.last.shelter.processors.skills.BulwarkProcessor;
+import in.indigenous.last.shelter.processors.skills.CombatSpeedProcessor;
 import in.indigenous.last.shelter.processors.skills.DamageProcessor;
 import in.indigenous.last.shelter.processors.skills.EnemyMightProcessor;
 import in.indigenous.last.shelter.processors.skills.EnemyResistanceProcessor;
+import in.indigenous.last.shelter.processors.skills.HPProcessor;
 import in.indigenous.last.shelter.processors.skills.MarchingCapacityProcessor;
 import in.indigenous.last.shelter.processors.skills.MightProcessor;
 import in.indigenous.last.shelter.processors.skills.ResistanceProcessor;
@@ -82,6 +84,8 @@ public class Application extends SpringBootServletInitializer {
 		processors.add(new SeigeMightProcessor());
 		processors.add(new EnemyMightProcessor());
 		processors.add(new EnemyResistanceProcessor());
+		processors.add(new HPProcessor());
+		processors.add(new CombatSpeedProcessor());
 		return processors;
 	}
 

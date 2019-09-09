@@ -38,6 +38,8 @@ public class CombatHero {
 
 	private double bulwark;
 
+	private double hp;
+
 	public int getId() {
 		return id;
 	}
@@ -180,6 +182,14 @@ public class CombatHero {
 
 	public void setLevel(int level) {
 		this.level = level;
+	}
+
+	public double getHp() {
+		return hp;
+	}
+
+	public void setHp(double hp) {
+		this.hp = hp;
 	}
 
 }
